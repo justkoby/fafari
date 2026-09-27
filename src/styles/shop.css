@@ -460,6 +460,71 @@
   margin-top: 26px;
 }
 
+.rose-guide {
+  max-width: 880px;
+  margin-top: 42px;
+}
+
+.rose-guide-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1.15;
+}
+
+.rose-guide-intro {
+  max-width: 68ch;
+  margin-top: 12px;
+  color: var(--cream-dim);
+}
+
+.rose-guide-list {
+  margin-top: 30px;
+  border-top: 1px solid rgba(244, 237, 225, 0.2);
+}
+
+.rose-guide-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(14px, 3vw, 44px);
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(244, 237, 225, 0.2);
+}
+
+.rose-guide-name {
+  text-transform: capitalize;
+}
+
+.rose-guide-price {
+  color: var(--gold-soft);
+  white-space: nowrap;
+}
+
+.rose-guide-link {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rose-guide-link:hover,
+.rose-guide-link:focus-visible {
+  color: var(--gold-soft);
+}
+
+@media (max-width: 560px) {
+  .rose-guide-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 12px;
+  }
+
+  .rose-guide-link {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
 /* Product detail (route: /product/<slug>) ----------------------------- */
 
 .product-detail {

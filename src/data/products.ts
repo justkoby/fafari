@@ -39,6 +39,19 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   'Gift Sets',
 ];
 
+/** Fafari's Valentine's Day rose bouquet price list, supplied as a reference.
+ * Seasonal guide prices are kept separate from the everyday sample catalogue. */
+export const VALENTINE_ROSE_OPTIONS = [
+  { roses: 1, price: 85 },
+  { roses: 6, price: 500 },
+  { roses: 10, price: 800 },
+  { roses: 12, price: 950 },
+  { roses: 20, price: 1500 },
+  { roses: 30, price: 2250 },
+  { roses: 50, price: 3700 },
+  { roses: 100, price: 7250 },
+] as const;
+
 /** GH₵1,850 — thousands separated, cedi prefix. */
 export function formatPrice(cedis: number): string {
   return `GH₵${cedis.toLocaleString('en-US')}`;
