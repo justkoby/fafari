@@ -11,6 +11,10 @@ import {
 import { IconArrow } from './Icons';
 import { Link } from './Link';
 
+/* Wedding/event enquiries go straight to the studio WhatsApp line with the
+   visitor's details prefilled — there is no server inbox behind this form. */
+const ENQUIRY_WHATSAPP = 'https://wa.me/233506580545';
+
 function PickedCard({ card }: { card: ResultCard }) {
   const body = (
     <>
@@ -47,6 +51,7 @@ export function DiscoverySection() {
   const [result, setResult] = useState<Recommendation | null>(null);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [enquirySent, setEnquirySent] = useState(false);
+  const [enquiryHref, setEnquiryHref] = useState<string | null>(null);
   const occasionGroupRef = useRef<HTMLDivElement | null>(null);
 
   const ready = occasion !== null && gesture !== null;
@@ -189,16 +194,37 @@ export function DiscoverySection() {
           {enquiryOpen && (
             <div className="discovery-enquiry" id="discovery-enquiry">
               {enquirySent ? (
-                <p className="discovery-enquiry-sent">
-                  Medaase — your enquiry is with our events desk. We will be in touch personally.
-                </p>
+                <div className="discovery-enquiry-sent">
+                  <p>
+                    Medaase — we've opened WhatsApp with your enquiry prefilled. Press send there and our
+                    events desk will reply personally.
+                  </p>
+                  {enquiryHref && (
+                    <a
+                      className="discovery-enquiry-reopen"
+                      href={enquiryHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Reopen WhatsApp
+                      <IconArrow className="discovery-enquire-icon" />
+                    </a>
+                  )}
+                </div>
               ) : (
                 <form
                   className="discovery-enquiry-form"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    /* Demo stub: connect the real enquiry endpoint here later. */
+                    const data = new FormData(event.currentTarget);
+                    const email = String(data.get('email') ?? '').trim();
+                    const about = String(data.get('message') ?? '').trim();
+                    const lines = ['Wedding / event enquiry from the Fafari website.', `Email: ${email}`];
+                    if (about) lines.push(`About the day: ${about}`);
+                    const href = `${ENQUIRY_WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`;
+                    setEnquiryHref(href);
                     setEnquirySent(true);
+                    window.open(href, '_blank', 'noopener,noreferrer');
                   }}
                 >
                   <p className="discovery-enquiry-copy">
@@ -208,11 +234,23 @@ export function DiscoverySection() {
                   <label className="visually-hidden" htmlFor="enquiry-email">
                     Your email
                   </label>
-                  <input id="enquiry-email" type="email" required placeholder="Your email" autoComplete="email" />
+                  <input
+                    id="enquiry-email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="Your email"
+                    autoComplete="email"
+                  />
                   <label className="visually-hidden" htmlFor="enquiry-message">
                     About your day
                   </label>
-                  <textarea id="enquiry-message" rows={3} placeholder="The date, the room, the feeling…" />
+                  <textarea
+                    id="enquiry-message"
+                    name="message"
+                    rows={3}
+                    placeholder="The date, the room, the feeling…"
+                  />
                   <button type="submit" className="btn btn--ink">
                     Send Enquiry
                   </button>

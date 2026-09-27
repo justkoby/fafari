@@ -419,10 +419,38 @@ a.discovery-card-link:hover .discovery-card-name {
 }
 
 .discovery-enquiry-sent {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 15px;
   letter-spacing: 0.02em;
+}
+
+.discovery-enquiry-reopen {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid rgba(17, 17, 17, 0.3);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.discovery-enquiry-reopen:hover {
+  border-color: var(--gold-deep);
+  color: var(--gold-deep);
+  background: rgba(214, 153, 45, 0.08);
+}
+
+.discovery-enquiry-reopen:hover .discovery-enquire-icon {
+  transform: translateX(4px);
 }
 
 /* Editorial image ------------------------------------------------------- */

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AssistantProvider } from './assistant/AssistantContext';
 import { CategorySection } from './components/CategorySection';
 import { ClientCamSection } from './components/ClientCamSection';
+import { CustomOrderSection } from './components/CustomOrderSection';
 import { FounderSection } from './components/FounderSection';
 import { Hero } from './components/Hero';
 import { DiscoverySection } from './components/DiscoverySection';
@@ -42,7 +44,7 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <AssistantProvider>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
@@ -63,10 +65,11 @@ export default function App() {
             <CategorySection />
             <FounderSection />
             <ClientCamSection />
+            <CustomOrderSection />
           </>
         )}
       </main>
       <SiteFooter />
-    </>
+    </AssistantProvider>
   );
 }

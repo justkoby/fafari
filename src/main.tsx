@@ -8,7 +8,9 @@ import './styles/discovery.css';
 import './styles/shop.css';
 import './styles/founder.css';
 import './styles/client-cam.css';
+import './styles/custom-order.css';
 import './styles/footer.css';
+import './styles/assistant.css';
 import App from './App';
 
 createRoot(document.getElementById('root')!).render(

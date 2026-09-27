@@ -1,0 +1,107 @@
+/* ------------------------------------------------------------------
+   Custom order — the considered close between Client Cam and the
+   footer: one full-width burgundy breath, centred copy, and a single
+   warm ivory way to reply.
+------------------------------------------------------------------- */
+
+.custom-order {
+  background: #6b2b25;
+  color: var(--cream);
+  padding: clamp(72px, 9vw, 132px) 0;
+  text-align: center;
+}
+
+.custom-order-inner {
+  max-width: 760px;
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: grid;
+  justify-items: center;
+}
+
+/* Centred eyebrow with a rule either side — quieter than the
+   left-aligned section eyebrows, fitting for a closing moment. */
+.custom-order-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gold-soft);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.custom-order-eyebrow::before,
+.custom-order-eyebrow::after {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--gold-soft);
+}
+
+.custom-order-title {
+  margin-top: 18px;
+  color: var(--cream);
+}
+
+.custom-order-body {
+  margin-top: 16px;
+  max-width: 52ch;
+  color: rgba(244, 237, 225, 0.85);
+  font-size: clamp(15px, 1.25vw, 17px);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Warm ivory button, dark text; the hover warms it to gold-soft. */
+.custom-order-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: clamp(28px, 3vw, 40px);
+  min-height: 52px;
+  padding: 15px 32px;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color var(--dur) var(--ease);
+}
+
+.custom-order-cta:hover,
+.custom-order-cta:focus-visible {
+  background: var(--gold-soft);
+}
+
+.custom-order-cta:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 4px;
+}
+
+.custom-order-cta-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  transition: transform var(--dur) var(--ease);
+}
+
+.custom-order-cta:hover .custom-order-cta-icon,
+.custom-order-cta:focus-visible .custom-order-cta-icon {
+  transform: translateX(4px);
+}
+
+/* Mobile — tighter copy block, full-width tap target. */
+@media (max-width: 599px) {
+  .custom-order {
+    padding: clamp(56px, 14vw, 88px) 0;
+  }
+
+  .custom-order-cta {
+    width: 100%;
+  }
+}

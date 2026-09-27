@@ -1,12 +1,12 @@
 import type { MouseEvent } from 'react';
-import { FOOTER, FOOTER_COLUMNS } from '../data/footer';
-import { IconArrow } from './Icons';
+import { FOOTER, FOOTER_COLUMNS, type FooterLink } from '../data/footer';
 import { Link } from './Link';
 import { navigate, readRoute } from '../router';
 
-/** Site footer — a deep burgundy close to the page: the wordmark and a
-    one-line promise, the link columns that have real routes today, and a
-    quiet copyright row. Columns stack on mobile. */
+/** Site footer — a near-black close: the ivory wordmark, a one-line
+    promise and the studio description on the left; the link columns
+    that exist today beside them; a quiet copyright row under a burgundy
+    hairline. Columns stack on mobile. */
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
@@ -25,41 +25,40 @@ export function SiteFooter() {
     window.requestAnimationFrame(() => window.requestAnimationFrame(scroll));
   };
 
+  const renderItem = (item: FooterLink) => (
+    <li key={item.label}>
+      {item.prefix && <span className="footer-contact-prefix">{item.prefix} </span>}
+      {item.external ? (
+        <a className="footer-link" href={item.href} target="_blank" rel="noopener noreferrer">
+          {item.label}
+        </a>
+      ) : (
+        <Link
+          className="footer-link"
+          href={item.href}
+          onClick={item.anchor ? (event) => handleAnchor(event, item.anchor as string) : undefined}
+        >
+          {item.label}
+        </Link>
+      )}
+    </li>
+  );
+
   return (
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-top">
           <div className="footer-brand">
-            <img className="footer-logo" src="/assets/fafari-logo.svg" alt="FAFARI" width={132} height={40} />
+            <span className="footer-logo" role="img" aria-label="FAFARI" />
             <p className="footer-tagline">{FOOTER.tagline}</p>
-            <a
-              className="footer-instagram"
-              href={FOOTER.instagram.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {FOOTER.instagram.label}
-              <IconArrow className="footer-instagram-icon" />
-            </a>
+            <p className="footer-description">{FOOTER.description}</p>
           </div>
           {FOOTER_COLUMNS.filter((column) => column.items.length > 0).map((column) => (
             <nav key={column.id} className="footer-col" aria-labelledby={`footer-col-${column.id}`}>
               <h3 className="footer-col-title" id={`footer-col-${column.id}`}>
                 {column.title}
               </h3>
-              <ul className="footer-list">
-                {column.items.map((item) => (
-                  <li key={item.label}>
-                    <Link
-                      className="footer-link"
-                      href={item.href}
-                      onClick={item.anchor ? (event) => handleAnchor(event, item.anchor as string) : undefined}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <ul className="footer-list">{column.items.map(renderItem)}</ul>
             </nav>
           ))}
         </div>

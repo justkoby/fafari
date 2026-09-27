@@ -6,7 +6,8 @@ import {
   searchProducts,
 } from '../data/searchIndex';
 import { navigate } from '../router';
-import { IconArrow, IconClose, IconSearch } from './Icons';
+import { useAssistant } from '../assistant/AssistantContext';
+import { IconArrow, IconChat, IconClose, IconSearch } from './Icons';
 import { Link } from './Link';
 
 const DEBOUNCE_MS = 200;
@@ -20,6 +21,7 @@ interface SearchPanelProps {
 }
 
 export function SearchPanel({ open, onClose, onSubmit }: SearchPanelProps) {
+  const assistant = useAssistant();
   const [query, setQuery] = useState('');
   const [debounced, setDebounced] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -62,6 +64,13 @@ export function SearchPanel({ open, onClose, onSubmit }: SearchPanelProps) {
       },
       onHome ? 0 : 80,
     );
+  };
+
+  /* Hand the typed term to the assistant, then close the search panel. */
+  const openAssistantFromPanel = () => {
+    const q = query.trim();
+    onClose();
+    assistant.open(q ? { query: q } : {});
   };
 
   return (
@@ -171,6 +180,12 @@ export function SearchPanel({ open, onClose, onSubmit }: SearchPanelProps) {
               </button>
             </div>
           )}
+
+          <button type="button" className="search-assistant" onClick={openAssistantFromPanel}>
+            <IconChat className="search-assistant-icon" />
+            Ask the Fafari Assistant
+            <IconArrow className="search-assistant-arrow" />
+          </button>
         </div>
       </div>
     </>

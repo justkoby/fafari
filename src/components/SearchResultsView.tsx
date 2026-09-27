@@ -7,7 +7,8 @@ import {
 } from '../data/products';
 import { searchNavEntries, searchProducts } from '../data/searchIndex';
 import { navigate } from '../router';
-import { IconSearch } from './Icons';
+import { useAssistant } from '../assistant/AssistantContext';
+import { IconArrow, IconSearch } from './Icons';
 import { Link } from './Link';
 import { ProductCard } from './ProductCard';
 
@@ -28,6 +29,7 @@ interface SearchResultsViewProps {
     category + price controls and a small related-categories area. */
 export function SearchResultsView({ query, category, price }: SearchResultsViewProps) {
   const [term, setTerm] = useState(query);
+  const assistant = useAssistant();
 
   const activeSlugs = (category ?? '').split(',').filter(Boolean);
   const activeCategories = PRODUCT_CATEGORIES.filter((item) => activeSlugs.includes(categorySlug(item)));
@@ -92,6 +94,15 @@ export function SearchResultsView({ query, category, price }: SearchResultsViewP
           {products.length} {products.length === 1 ? 'product' : 'products'}
           {filtersActive ? ' with your filters' : ''}
         </p>
+
+        <button
+          type="button"
+          className="results-assistant"
+          onClick={() => assistant.open({ query, category, price })}
+        >
+          Ask the Fafari Assistant
+          <IconArrow className="results-assistant-icon" />
+        </button>
 
         <div className="results-controls">
           <div className="results-cats" role="group" aria-label="Filter results by category">
@@ -177,6 +188,13 @@ export function SearchResultsView({ query, category, price }: SearchResultsViewP
               <Link className="results-browse" href="/shop">
                 Browse all products
               </Link>
+              <button
+                type="button"
+                className="results-browse"
+                onClick={() => assistant.open({ query, category, price })}
+              >
+                Ask the Fafari Assistant
+              </button>
               {filtersActive && (
                 <button
                   type="button"

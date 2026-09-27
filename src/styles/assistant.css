@@ -1,0 +1,412 @@
+/* ------------------------------------------------------------------
+   Fafari Assistant — one panel for the site. A right-side drawer on
+   desktop, a full-height sheet on mobile, over a dimmed backdrop. The
+   palette follows the dark commerce surfaces (ink, cream, gold) so the
+   existing product cards drop straight in; burgundy drives the discreet
+   trigger and the bespoke-order escape hatch.
+------------------------------------------------------------------- */
+
+.assistant-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(8, 4, 3, 0.62);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 240ms var(--ease), visibility 0s linear 240ms;
+}
+
+.assistant-backdrop[data-open='true'] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 240ms var(--ease);
+}
+
+.assistant-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 121;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 100%);
+  height: 100%;
+  height: 100dvh;
+  background: linear-gradient(to bottom, #1b1413 0%, #120d0c 100%);
+  border-left: 1px solid rgba(214, 153, 45, 0.22);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 320ms var(--ease), visibility 0s linear 320ms;
+}
+
+.assistant-drawer[data-open='true'] {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform 320ms var(--ease);
+}
+
+/* Header ---------------------------------------------------------- */
+
+.assistant-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(244, 237, 225, 0.1);
+}
+
+.assistant-eyebrow {
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.assistant-title {
+  margin-top: 4px;
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.assistant-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.assistant-startover {
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--cream-dim);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+
+.assistant-startover:hover {
+  color: var(--gold-soft);
+  background: rgba(244, 237, 225, 0.06);
+}
+
+/* Transcript ------------------------------------------------------ */
+
+.assistant-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.assistant-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.assistant-msg--user {
+  align-items: flex-end;
+}
+
+.assistant-msg--assistant {
+  align-items: stretch;
+}
+
+.assistant-bubble {
+  max-width: 88%;
+  padding: 12px 15px;
+  border-radius: 16px;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.assistant-msg--user .assistant-bubble {
+  align-self: flex-end;
+  background: var(--gold);
+  color: #201302;
+  border-bottom-right-radius: 5px;
+}
+
+.assistant-msg--assistant .assistant-bubble {
+  align-self: flex-start;
+  background: rgba(244, 237, 225, 0.06);
+  border: 1px solid rgba(244, 237, 225, 0.1);
+  color: var(--cream);
+  border-bottom-left-radius: 5px;
+}
+
+.assistant-text {
+  white-space: pre-wrap;
+}
+
+/* Recommendations reuse the shared product card, single column. */
+.assistant-products {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.assistant-cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 2px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: #201302;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.assistant-cta:hover {
+  background: var(--gold-soft);
+  transform: translateY(-1px);
+}
+
+.assistant-cta-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--dur) var(--ease);
+}
+
+.assistant-cta:hover .assistant-cta-icon {
+  transform: translateX(3px);
+}
+
+/* Typing indicator ------------------------------------------------ */
+
+.assistant-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.assistant-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  animation: assistant-blink 1.2s infinite ease-in-out;
+}
+
+.assistant-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.assistant-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes assistant-blink {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* Composer -------------------------------------------------------- */
+
+.assistant-composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(244, 237, 225, 0.1);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.assistant-input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 15px;
+  border-radius: 999px;
+  background: rgba(244, 237, 225, 0.06);
+  border: 1px solid rgba(244, 237, 225, 0.14);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.assistant-input::placeholder {
+  color: rgba(244, 237, 225, 0.42);
+}
+
+.assistant-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.assistant-send {
+  flex: 0 0 auto;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #201302;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background-color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+.assistant-send:hover:not(:disabled) {
+  background: var(--gold-soft);
+}
+
+.assistant-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Discreet site-wide trigger -------------------------------------- */
+
+.assistant-fab {
+  position: fixed;
+  right: clamp(16px, 3vw, 28px);
+  bottom: clamp(16px, 3vw, 28px);
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--burgundy);
+  color: var(--cream);
+  border: 1px solid rgba(230, 196, 137, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.assistant-fab:hover {
+  background: var(--burgundy-deep);
+  transform: translateY(-2px);
+}
+
+.assistant-fab[data-open='true'] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
+.assistant-fab-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Entry points — search results view + header search panel ----------- */
+
+.results-assistant {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  border: 1px solid rgba(214, 153, 45, 0.5);
+  border-radius: 999px;
+  color: var(--gold-soft);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.results-assistant:hover {
+  border-color: var(--gold);
+  color: var(--cream);
+  background: rgba(214, 153, 45, 0.12);
+}
+
+.results-assistant-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.search-assistant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(214, 153, 45, 0.34);
+  border-radius: 12px;
+  color: var(--cream);
+  font-size: 13.5px;
+  text-align: left;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+
+.search-assistant:hover {
+  border-color: var(--gold);
+  background: rgba(214, 153, 45, 0.1);
+}
+
+.search-assistant-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--gold);
+  flex: 0 0 auto;
+}
+
+.search-assistant-arrow {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  color: var(--gold-soft);
+}
+
+/* Mobile: full-height sheet, icon-only trigger --------------------- */
+
+@media (max-width: 560px) {
+  .assistant-drawer {
+    width: 100%;
+    border-left: 0;
+  }
+
+  .assistant-fab {
+    padding: 0;
+    width: 56px;
+    height: 56px;
+    gap: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .assistant-fab-label {
+    display: none;
+  }
+
+  .assistant-fab-icon {
+    width: 22px;
+    height: 22px;
+  }
+}

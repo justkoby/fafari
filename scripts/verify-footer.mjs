@@ -1,5 +1,6 @@
-/* Footer verification: placement, palette, real routes only, anchor
-   scroll, contrast ratios, keyboard focus, mobile stacking. */
+/* Footer verification: near-black palette, ivory logo/headings, grey
+   supporting text, contact column links, contrast (desktop + mobile),
+   hover/focus states, anchor scroll, mobile stacking. */
 import puppeteer from 'puppeteer-core';
 
 const results = [];
@@ -29,7 +30,24 @@ const CONTRAST_FN = `
     const l2 = lum(bg);
     return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
   };
+  const sample = (sel) => {
+    const footer = document.querySelector('.footer');
+    return ratio(parse(getComputedStyle(footer.querySelector(sel)).color), parse(getComputedStyle(footer).backgroundColor).slice(0, 3));
+  };
 `;
+
+const contrastReport = () =>
+  page.evaluate(`(() => {
+    ${CONTRAST_FN}
+    return {
+      link: sample('.footer-link'),
+      prefix: sample('.footer-contact-prefix'),
+      tagline: sample('.footer-tagline'),
+      description: sample('.footer-description'),
+      copyright: sample('.footer-copyright'),
+      title: sample('.footer-col-title'),
+    };
+  })()`);
 
 await page.setViewport({ width: 1440, height: 900 });
 await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
@@ -40,101 +58,92 @@ const desktop = await page.evaluate(() => {
   const footer = document.querySelector('.footer');
   const main = document.querySelector('main');
   const logo = footer.querySelector('.footer-logo');
-  const titles = [...footer.querySelectorAll('.footer-col-title')];
+  const logoCs = getComputedStyle(logo);
   const cols = [...footer.querySelectorAll('.footer-col')].map((col) => ({
     title: col.querySelector('.footer-col-title').textContent.trim(),
     titleFont: getComputedStyle(col.querySelector('.footer-col-title')).fontFamily,
-    items: [...col.querySelectorAll('.footer-link')].map((a) => ({
-      label: a.textContent.trim(),
-      href: a.getAttribute('href'),
-    })),
+    titleColor: getComputedStyle(col.querySelector('.footer-col-title')).color,
+    items: [...col.querySelectorAll('li')].map((li) => {
+      const a = li.querySelector('a');
+      return {
+        text: li.textContent.trim(),
+        href: a.getAttribute('href'),
+        target: a.getAttribute('target'),
+        rel: a.getAttribute('rel'),
+      };
+    }),
   }));
-  const allLinks = [...footer.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-  const bg = getComputedStyle(footer).backgroundColor;
-  const sample = (sel) => getComputedStyle(footer.querySelector(sel)).color;
   return {
     afterMain: main.nextElementSibling === footer,
-    afterClientCam: document.querySelector('.client-cam') !== null,
-    bg,
-    logoSrc: logo.getAttribute('src'),
-    logoAlt: logo.getAttribute('alt'),
-    logoLoaded: logo.naturalWidth > 0,
-    tagline: footer.querySelector('.footer-tagline').textContent.trim(),
-    cols,
-    allLinks,
-    insta: (() => {
-      const a = footer.querySelector('.footer-instagram');
-      return { href: a.getAttribute('href'), target: a.getAttribute('target'), rel: a.getAttribute('rel') };
-    })(),
-    copyright: footer.querySelector('.footer-copyright').textContent.trim(),
-    colors: {
-      link: sample('.footer-link'),
-      tagline: sample('.footer-tagline'),
-      copyright: sample('.footer-copyright'),
-      title: sample('.footer-col-title'),
-      insta: sample('.footer-instagram'),
+    bg: getComputedStyle(footer).backgroundColor,
+    logo: {
+      role: logo.getAttribute('role'),
+      label: logo.getAttribute('aria-label'),
+      mask: logoCs.maskImage || logoCs.webkitMaskImage,
+      color: logoCs.backgroundColor,
     },
-    bodyText: getComputedStyle(footer.querySelector('.footer-link')).fontSize,
+    tagline: footer.querySelector('.footer-tagline').textContent.trim(),
+    description: footer.querySelector('.footer-description').textContent.trim(),
+    brandInstagram: !!footer.querySelector('.footer-brand .footer-instagram'),
+    cols,
+    copyright: footer.querySelector('.footer-copyright').textContent.trim(),
+    bottomHairline: getComputedStyle(footer.querySelector('.footer-bottom')).borderTopColor,
     founderSlides: document.querySelectorAll('.founder-slide').length,
     clientTiles: document.querySelectorAll('.client-tile').length,
     pageOverflow: document.scrollingElement.scrollWidth > window.innerWidth,
   };
 });
 
-check('footer closes the page after Client Cam', desktop.afterMain && desktop.afterClientCam);
-check('deep burgundy background', desktop.bg === 'rgb(107, 43, 37)', desktop.bg);
-check('existing Fafari logo, loaded', desktop.logoSrc === '/assets/fafari-logo.svg' && desktop.logoLoaded && desktop.logoAlt === 'FAFARI', `${desktop.logoSrc} loaded=${desktop.logoLoaded}`);
-check('tagline line present', desktop.tagline === 'Thoughtful flowers and gifts for the moments that matter.', desktop.tagline);
-check('Shop column lists the four real shop routes', JSON.stringify(desktop.cols[0]?.items) === JSON.stringify([
-  { label: 'Flowers', href: '/shop?cat=flowers' },
-  { label: 'Gifts', href: '/shop?cat=gift-hampers,gift-sets' },
-  { label: 'Plants', href: '/shop?cat=plants' },
-  { label: 'All Products', href: '/shop' },
-]), JSON.stringify(desktop.cols[0]?.items));
-check('Explore column keeps only Client Cam', desktop.cols[1]?.title === 'Explore' && desktop.cols[1].items.length === 1 && desktop.cols[1].items[0].label === 'Client Cam', JSON.stringify(desktop.cols[1]));
-check('unbuilt pages stay out (no Help column, no dead items)', desktop.cols.length === 2 && !desktop.allLinks.some((h) => h === '#' || h === '/#'), `cols=${desktop.cols.length}`);
-check('no invented contact details', !/whatsapp|@fafari|tel:|mailto:|\+\d/i.test(desktop.allLinks.join(' ')), desktop.allLinks.join(' '));
-check('column headings use Bricolage Grotesque', desktop.cols.every((c) => c.titleFont.includes('Bricolage Grotesque')), desktop.cols[0]?.titleFont);
-check('body text stays readable', parseFloat(desktop.bodyText) >= 15, desktop.bodyText);
-check('instagram link correct', desktop.insta.href === 'https://www.instagram.com/fafari_gh/' && desktop.insta.target === '_blank' && desktop.insta.rel.includes('noopener'), desktop.insta.href);
+check('footer closes the page after Client Cam', desktop.afterMain);
+check('near-black background', desktop.bg === 'rgb(16, 16, 16)', desktop.bg);
+check('logo is the ivory-masked wordmark', desktop.logo.role === 'img' && desktop.logo.label === 'FAFARI' && desktop.logo.mask.includes('fafari-logo.svg') && desktop.logo.color === 'rgb(244, 237, 225)', JSON.stringify(desktop.logo));
+check('tagline kept', desktop.tagline === 'Thoughtful flowers and gifts for the moments that matter.', desktop.tagline);
+check('Accra florist description present', desktop.description === 'Fafari is a florist in Accra offering bespoke floral arrangements, gifts, interior styling, and event services.', desktop.description);
+check('brand column no longer duplicates Instagram', !desktop.brandInstagram);
+check('three columns: Shop, Explore, Contact Us', desktop.cols.map((c) => c.title).join('|') === 'Shop|Explore|Contact Us', desktop.cols.map((c) => c.title).join('|'));
+check('headings ivory + Bricolage', desktop.cols.every((c) => c.titleColor === 'rgb(244, 237, 225)' && c.titleFont.includes('Bricolage Grotesque')), desktop.cols[0].titleColor);
+
+const contact = desktop.cols[2]?.items ?? [];
+check('Call row links to tel:', contact[0]?.text === 'Call: +233 24 420 3010' && contact[0]?.href === 'tel:+233244203010' && !contact[0]?.target, JSON.stringify(contact[0]));
+check('WhatsApp row links to wa.me in a new tab', contact[1]?.text === 'WhatsApp: +233 50 658 0545' && contact[1]?.href === 'https://wa.me/233506580545' && contact[1]?.target === '_blank' && (contact[1]?.rel || '').includes('noopener'), JSON.stringify(contact[1]));
+check('Instagram row links to the feed in a new tab', contact[2]?.text === 'Instagram: @fafari_gh' && contact[2]?.href === 'https://www.instagram.com/fafari_gh/' && contact[2]?.target === '_blank' && (contact[2]?.rel || '').includes('noopener'), JSON.stringify(contact[2]));
+check('shop + explore columns unchanged', desktop.cols[0].items.length === 4 && desktop.cols[1].items[0].href === '/#client-cam', `${desktop.cols[0].items.length}/${desktop.cols[1].items[0].href}`);
 check('copyright row with current year', desktop.copyright === `© ${new Date().getFullYear()} Fafari. All rights reserved.`, desktop.copyright);
+check('burgundy reserved for the hairline accent', desktop.bottomHairline === 'rgba(124, 50, 44, 0.55)', desktop.bottomHairline);
 check('founder + client cam untouched', desktop.founderSlides === 5 && desktop.clientTiles === 4, `${desktop.founderSlides}/${desktop.clientTiles}`);
 check('no horizontal overflow', !desktop.pageOverflow);
 
-const contrasts = await page.evaluate(`(() => {
-  ${CONTRAST_FN}
-  const footer = document.querySelector('.footer');
-  const bg = parse(getComputedStyle(footer).backgroundColor).slice(0, 3);
-  const sample = (sel) => parse(getComputedStyle(footer.querySelector(sel)).color);
-  return {
-    link: ratio(sample('.footer-link'), bg),
-    tagline: ratio(sample('.footer-tagline'), bg),
-    copyright: ratio(sample('.footer-copyright'), bg),
-    title: ratio(sample('.footer-col-title'), bg),
-    insta: ratio(sample('.footer-instagram'), bg),
-  };
-})()`);
+const contrasts = await contrastReport();
 for (const [key, value] of Object.entries(contrasts)) {
-  check(`contrast ${key} >= 4.5:1`, value >= 4.5, value.toFixed(2));
+  check(`desktop contrast ${key} >= 4.5:1`, value >= 4.5, value.toFixed(2));
 }
 
+/* hover: ivory label with a burgundy underline accent */
+await page.hover('.footer-link[href="https://wa.me/233506580545"]');
+await new Promise((r) => setTimeout(r, 400));
+const hover = await page.$eval('.footer-link[href="https://wa.me/233506580545"]', (el) => {
+  const cs = getComputedStyle(el);
+  return { color: cs.color, line: cs.textDecorationLine, deco: cs.textDecorationColor };
+});
+check('hover: ivory text + burgundy underline', hover.color === 'rgb(244, 237, 225)' && hover.line === 'underline' && hover.deco === 'rgb(124, 50, 44)', JSON.stringify(hover));
+await page.mouse.move(10, 10);
+
 /* keyboard focus ring */
-await page.evaluate(() => document.querySelector('.footer-instagram').focus());
+await page.evaluate(() => document.querySelector('.client-instagram').focus());
 await page.keyboard.press('Tab');
 const focus = await page.evaluate(() => {
-  const el = document.activeElement;
-  const cs = getComputedStyle(el);
-  return { label: el.textContent.trim(), width: cs.outlineWidth, style: cs.outlineStyle, color: cs.outlineColor };
+  const cs = getComputedStyle(document.activeElement);
+  return { label: document.activeElement.textContent.trim(), width: cs.outlineWidth, style: cs.outlineStyle, color: cs.outlineColor };
 });
-check('keyboard focus ring on footer links', focus.label === 'Flowers' && focus.width === '2px' && focus.style === 'solid', JSON.stringify(focus));
+check('keyboard focus ring on footer links', focus.label === 'Flowers' && focus.width === '2px' && focus.style === 'solid' && focus.color === 'rgb(244, 237, 225)', JSON.stringify(focus));
 
 /* anchor link: home -> scrolls to Client Cam */
 await page.evaluate(() => document.querySelector('.footer-link[href="/#client-cam"]').click());
 await new Promise((r) => setTimeout(r, 1400));
-const homeAnchor = await page.evaluate(() => {
-  const target = document.getElementById('client-cam').getBoundingClientRect().top;
-  return { path: location.pathname, offset: Math.round(target) };
-});
+const homeAnchor = await page.evaluate(() => ({
+  path: location.pathname,
+  offset: Math.round(document.getElementById('client-cam').getBoundingClientRect().top),
+}));
 check('Client Cam link scrolls to the section from home', homeAnchor.path === '/' && Math.abs(homeAnchor.offset - 84) < 24, JSON.stringify(homeAnchor));
 
 /* shop links route client-side */
@@ -153,8 +162,7 @@ const shopAnchor = await page.evaluate(() => ({
 }));
 check('Client Cam link routes home from /shop and scrolls', shopAnchor.path === '/' && Math.abs(shopAnchor.offset - 84) < 24, JSON.stringify(shopAnchor));
 
-/* screenshots + mobile stacking */
-await page.evaluate(() => window.scrollTo(0, 0));
+/* screenshots + mobile */
 await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
 await page.evaluate(() => document.querySelector('.footer').scrollIntoView({ block: 'end' }));
 await new Promise((r) => setTimeout(r, 400));
@@ -176,6 +184,17 @@ const mobile = await page.evaluate(() => {
 });
 check('mobile: columns stack in one column', mobile.display === 'grid' && mobile.stacked, JSON.stringify(mobile));
 check('mobile: no horizontal overflow', !mobile.pageOverflow);
+
+const mobileContrasts = await contrastReport();
+for (const [key, value] of Object.entries(mobileContrasts)) {
+  check(`mobile contrast ${key} >= 4.5:1`, value >= 4.5, value.toFixed(2));
+}
+/* Frame the shot below the sticky header so the capture is clean. */
+await page.evaluate(() => {
+  const top = document.querySelector('.footer').getBoundingClientRect().top + window.scrollY;
+  window.scrollTo(0, top - 84);
+});
+await new Promise((r) => setTimeout(r, 300));
 const mobileFooter = await page.$('.footer');
 await mobileFooter.screenshot({ path: 'scripts/shots/footer-mobile.png' });
 

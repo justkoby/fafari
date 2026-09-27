@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------
-   Site footer — a deep burgundy close: wordmark and promise on the
-   left, the link columns that exist today beside them, and a quiet
-   copyright row under a hairline. Ivory on burgundy throughout; gold
-   only for the column titles and the Instagram line.
+   Site footer — a near-black close. Warm ivory carries the wordmark
+   and column headings, muted light grey the supporting text and links,
+   and burgundy appears only as a whisper: hover underlines and the
+   hairline above the copyright row.
 ------------------------------------------------------------------- */
 
 .footer {
-  background: #6b2b25;
+  background: #101010;
   color: var(--cream);
   padding-top: clamp(56px, 6vw, 88px);
 }
@@ -29,70 +29,42 @@
   max-width: 420px;
 }
 
+/* The gold wordmark recoloured to warm ivory via a mask, so the logo
+   sits in the footer palette without a second asset. */
 .footer-logo {
   display: block;
   width: 132px;
   height: 40px;
+  background: var(--cream);
+  -webkit-mask: url('/assets/fafari-logo.svg') center / contain no-repeat;
+  mask: url('/assets/fafari-logo.svg') center / contain no-repeat;
 }
 
 .footer-tagline {
   margin-top: 20px;
   max-width: 34ch;
-  color: rgba(244, 237, 225, 0.82);
+  color: #b3b1ae;
   font-size: 15px;
   line-height: 1.7;
   letter-spacing: 0.01em;
 }
 
-.footer-instagram {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 24px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(230, 196, 137, 0.5);
-  color: var(--gold-soft);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition:
-    color var(--dur) var(--ease),
-    border-color var(--dur) var(--ease);
-}
-
-.footer-instagram:hover,
-.footer-instagram:focus-visible {
-  color: var(--cream);
-  border-color: var(--cream);
-}
-
-.footer-instagram:focus-visible {
-  outline: 2px solid var(--gold-soft);
-  outline-offset: 4px;
-}
-
-.footer-instagram-icon {
-  flex: none;
-  width: 14px;
-  height: 14px;
-  color: currentColor;
-  transition: transform var(--dur) var(--ease);
-}
-
-.footer-instagram:hover .footer-instagram-icon,
-.footer-instagram:focus-visible .footer-instagram-icon {
-  transform: translateX(4px);
+.footer-description {
+  margin-top: 12px;
+  max-width: 38ch;
+  color: #b3b1ae;
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
 }
 
 .footer-col {
-  flex: 0 1 168px;
-  min-width: 150px;
+  flex: 0 1 210px;
+  min-width: 190px;
 }
 
 .footer-col-title {
-  color: var(--gold-soft);
+  color: var(--cream);
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 500;
@@ -108,21 +80,31 @@
   list-style: none;
 }
 
+.footer-contact-prefix {
+  color: #b3b1ae;
+  white-space: nowrap;
+}
+
 .footer-link {
-  color: rgba(244, 237, 225, 0.82);
+  color: #b3b1ae;
   font-size: 15px;
   line-height: 1.5;
   text-decoration: none;
+  white-space: nowrap;
   transition: color var(--dur) var(--ease);
 }
 
+/* Burgundy only as a subtle hover accent under the ivory label. */
 .footer-link:hover {
-  color: var(--gold-soft);
+  color: var(--cream);
+  text-decoration: underline;
+  text-decoration-color: var(--burgundy);
+  text-underline-offset: 4px;
 }
 
 .footer-link:focus-visible {
-  color: var(--gold-soft);
-  outline: 2px solid var(--gold-soft);
+  color: var(--cream);
+  outline: 2px solid var(--cream);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -134,11 +116,11 @@
   gap: 12px;
   margin-top: clamp(48px, 5vw, 76px);
   padding: 22px 0 26px;
-  border-top: 1px solid rgba(244, 237, 225, 0.22);
+  border-top: 1px solid rgba(124, 50, 44, 0.55);
 }
 
 .footer-copyright {
-  color: rgba(244, 237, 225, 0.72);
+  color: #b3b1ae;
   font-size: 13px;
   letter-spacing: 0.04em;
 }
