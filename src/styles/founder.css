@@ -1,0 +1,124 @@
+/* ------------------------------------------------------------------
+   A Note from Our Founder — editorial ivory band between the category
+   cards and Client Cam. A fixed-frame crossfade slideshow anchors the
+   left; the note, heading and attribution stay completely static.
+------------------------------------------------------------------- */
+
+.founder {
+  background: #fbf7ee;
+  color: var(--ink);
+  padding: clamp(64px, 7vw, 104px) 0;
+}
+
+.founder-inner {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  grid-template-areas: 'portrait note';
+  column-gap: clamp(40px, 5vw, 88px);
+  align-items: center;
+}
+
+/* Fixed aspect frame: slides crossfade inside it, so the section never
+   jumps or shifts while the slideshow runs. */
+.founder-frame {
+  grid-area: portrait;
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid rgba(124, 50, 44, 0.28);
+  background: #e6ded2;
+}
+
+.founder-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 800ms var(--ease);
+}
+
+/* Incoming and outgoing slides transition together, so both images
+   briefly overlap — a true crossfade, never a fade through the frame
+   background. */
+.founder-slide[data-active='true'] {
+  opacity: 1;
+}
+
+/* Per-photo crops: keep faces and the important action in frame. */
+.founder-slide--1 {
+  object-position: 50% 20%;
+}
+
+.founder-slide--2 {
+  object-position: 50% 50%;
+}
+
+.founder-slide--3 {
+  object-position: 50% 35%;
+}
+
+.founder-slide--4 {
+  object-position: 50% 30%;
+}
+
+.founder-slide--5 {
+  object-position: 50% 22%;
+}
+
+.founder-note {
+  grid-area: note;
+  max-width: 56ch;
+}
+
+.founder-title {
+  color: var(--ink);
+}
+
+.founder-body {
+  margin-top: clamp(18px, 2vw, 26px);
+  color: rgba(17, 17, 17, 0.78);
+  font-size: clamp(15px, 1.25vw, 17px);
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}
+
+/* Restrained burgundy accent: a short rule and the signature line. */
+.founder-attribution {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(22px, 2.4vw, 32px);
+  color: var(--burgundy);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.founder-attribution::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--burgundy);
+}
+
+/* Mobile — frame above the text; the same per-slide crops keep every
+   subject visible at the narrower width. */
+@media (max-width: 899px) {
+  .founder-inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'portrait'
+      'note';
+    row-gap: 34px;
+  }
+
+  .founder-note {
+    max-width: none;
+  }
+}

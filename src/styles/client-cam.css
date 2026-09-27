@@ -1,0 +1,195 @@
+/* ------------------------------------------------------------------
+   Client Cam — a dark editorial band after the founder note. One
+   featured frame (client-1) with three balanced companions; a quiet
+   hover swell on each photo and a single link out to Instagram.
+------------------------------------------------------------------- */
+
+.client-cam {
+  background: var(--ink);
+  color: var(--cream);
+  padding: clamp(64px, 7vw, 104px) 0;
+  /* The footer's "Client Cam" link scrolls here; clear the sticky header. */
+  scroll-margin-top: calc(var(--header-h) + 8px);
+}
+
+.client-inner {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.client-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.client-eyebrow::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.client-title {
+  margin-top: 14px;
+  color: var(--cream);
+}
+
+.client-intro {
+  margin-top: 12px;
+  max-width: 52ch;
+  color: var(--cream-dim);
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+}
+
+.client-head {
+  margin-bottom: clamp(28px, 3vw, 44px);
+}
+
+/* Mosaic: the featured frame anchors the left across both rows; the
+   wide slot (two subjects side by side) sits top right over two half
+   frames. Row heights are viewport-clamped so every crop keeps a
+   steady, editorial proportion. */
+.client-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 2.5fr) minmax(0, 2.5fr);
+  grid-template-rows: minmax(0, clamp(240px, 30vw, 432px)) minmax(0, clamp(170px, 21.5vw, 310px));
+  gap: clamp(12px, 1.4vw, 20px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.client-tile {
+  position: relative;
+  overflow: hidden;
+  background: rgba(244, 237, 225, 0.08);
+}
+
+.client-tile--featured {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.client-tile--wide {
+  grid-column: 2 / 4;
+  grid-row: 1;
+}
+
+.client-tile--3 {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.client-tile--4 {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.client-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Per-photo crops: keep the clients and their bouquets in frame. */
+.client-tile--1 .client-media {
+  object-position: 50% 22%;
+}
+
+.client-tile--2 .client-media {
+  object-position: 50% 40%;
+}
+
+.client-tile--3 .client-media {
+  object-position: 50% 35%;
+}
+
+.client-tile--4 .client-media {
+  object-position: 50% 40%;
+}
+
+/* Subtle hover movement only — no overlays, no captions. */
+@media (prefers-reduced-motion: no-preference) {
+  .client-media {
+    transition: transform 700ms var(--ease);
+  }
+
+  .client-tile:hover .client-media {
+    transform: scale(1.04);
+  }
+}
+
+.client-instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: clamp(24px, 2.6vw, 36px);
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(214, 153, 45, 0.55);
+  color: var(--gold-soft);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.client-instagram:hover,
+.client-instagram:focus-visible {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.client-instagram:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.client-instagram-icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--gold);
+  transition: transform var(--dur) var(--ease);
+}
+
+.client-instagram:hover .client-instagram-icon,
+.client-instagram:focus-visible .client-instagram-icon {
+  transform: translateX(4px);
+}
+
+/* Mobile — a swipeable snap row: every frame stays large, and the next
+   one peeks in at the edge so the swipe reads immediately. */
+@media (max-width: 899px) {
+  .client-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    margin-inline: calc(var(--container-pad) * -1);
+    padding-inline: var(--container-pad);
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .client-tile {
+    /* vw, not %: the row carries its own padding, so a percentage basis
+       would shrink the frames below a comfortable swipe size. */
+    flex: 0 0 min(76vw, 480px);
+    aspect-ratio: 4 / 5;
+    scroll-snap-align: center;
+  }
+}
