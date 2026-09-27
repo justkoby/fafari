@@ -1,0 +1,210 @@
+From 0cb009a50b505fec53a73ccecdda5cf992f2bc70 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Sun, 27 Sep 2026 03:46:20 +0000
+Subject: [PATCH] Add Valentine rose price guide
+
+---
+ src/components/ShopPage.tsx | 65 ++++++++++++++++++++++++++++++-------
+ src/data/products.ts        | 13 ++++++++
+ src/styles/shop.css         | 65 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 131 insertions(+), 12 deletions(-)
+
+diff --git a/src/components/ShopPage.tsx b/src/components/ShopPage.tsx
+index ad57eb1..aaf4a7d 100644
+--- a/src/components/ShopPage.tsx
++++ b/src/components/ShopPage.tsx
+@@ -1,4 +1,4 @@
+-import { PRODUCT_CATEGORIES, PRODUCTS, categorySlug } from '../data/products';
++import { PRODUCT_CATEGORIES, PRODUCTS, VALENTINE_ROSE_OPTIONS, categorySlug, formatPrice } from '../data/products';
+ import { navigate } from '../router';
+ import { ProductCard } from './ProductCard';
+ 
+@@ -6,6 +6,7 @@ import { ProductCard } from './ProductCard';
+     The cat param accepts a comma-separated slug list so homepage category
+     tiles can span two catalogue categories (Gift Sets & Hampers). */
+ export function ShopPage({ category }: { category: string | null }) {
++  const showValentineRoses = category === 'valentines-roses';
+   const activeSlugs = (category ?? '').split(',').filter(Boolean);
+   const active = PRODUCT_CATEGORIES.filter((item) => activeSlugs.includes(categorySlug(item)));
+   const visible =
+@@ -26,7 +27,7 @@ export function ShopPage({ category }: { category: string | null }) {
+           <button
+             type="button"
+             className="choice shop-choice"
+-            aria-pressed={active.length === 0}
++            aria-pressed={active.length === 0 && !showValentineRoses}
+             onClick={() => navigate('/shop')}
+           >
+             All
+@@ -42,18 +43,58 @@ export function ShopPage({ category }: { category: string | null }) {
+               {item}
+             </button>
+           ))}
++          <button
++            type="button"
++            className="choice shop-choice"
++            aria-pressed={showValentineRoses}
++            onClick={() => navigate('/shop?cat=valentines-roses')}
++          >
++            Valentine Roses
++          </button>
+         </div>
+ 
+-        <p className="shop-count" role="status">
+-          {visible.length} {visible.length === 1 ? 'piece' : 'pieces'}
+-          {active.length === 0 ? '' : ` in ${active.join(' & ')}`}
+-        </p>
+-
+-        <ul className="product-grid">
+-          {visible.map((product) => (
+-            <ProductCard key={product.id} product={product} />
+-          ))}
+-        </ul>
++        {showValentineRoses ? (
++          <div className="rose-guide">
++            <h2 className="rose-guide-title">Valentine&rsquo;s rose bouquets</h2>
++            <p className="rose-guide-intro">
++              Fafari&rsquo;s Valentine&rsquo;s Day price guide. These are seasonal reference prices, so please confirm
++              the current price and availability before ordering. Fillers are available at an extra charge.
++            </p>
++            <ul className="rose-guide-list" aria-label="Valentine rose bouquet options">
++              {VALENTINE_ROSE_OPTIONS.map(({ roses, price }) => {
++                const name = `${roses} ${roses === 1 ? 'rose' : 'roses'} bouquet`;
++                const message = `Hello Fafari, I would like to ask about the ${name} from your Valentine's price list. Please confirm the current price and availability.`;
++                return (
++                  <li className="rose-guide-item" key={roses}>
++                    <span className="rose-guide-name">{name}</span>
++                    <span className="rose-guide-price">{formatPrice(price)}</span>
++                    <a
++                      className="rose-guide-link"
++                      href={`https://wa.me/233506580545?text=${encodeURIComponent(message)}`}
++                      target="_blank"
++                      rel="noopener noreferrer"
++                      aria-label={`Enquire about ${name} on WhatsApp`}
++                    >
++                      Enquire
++                    </a>
++                  </li>
++                );
++              })}
++            </ul>
++          </div>
++        ) : (
++          <>
++            <p className="shop-count" role="status">
++              {visible.length} {visible.length === 1 ? 'piece' : 'pieces'}
++              {active.length === 0 ? '' : ` in ${active.join(' & ')}`}
++            </p>
++            <ul className="product-grid">
++              {visible.map((product) => (
++                <ProductCard key={product.id} product={product} />
++              ))}
++            </ul>
++          </>
++        )}
+       </div>
+     </section>
+   );
+diff --git a/src/data/products.ts b/src/data/products.ts
+index 627ae3e..a95d1b2 100644
+--- a/src/data/products.ts
++++ b/src/data/products.ts
+@@ -39,6 +39,19 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
+   'Gift Sets',
+ ];
+ 
++/** Fafari's Valentine's Day rose bouquet price list, supplied as a reference.
++ * Seasonal guide prices are kept separate from the everyday sample catalogue. */
++export const VALENTINE_ROSE_OPTIONS = [
++  { roses: 1, price: 85 },
++  { roses: 6, price: 500 },
++  { roses: 10, price: 800 },
++  { roses: 12, price: 950 },
++  { roses: 20, price: 1500 },
++  { roses: 30, price: 2250 },
++  { roses: 50, price: 3700 },
++  { roses: 100, price: 7250 },
++] as const;
++
+ /** GH₵1,850 — thousands separated, cedi prefix. */
+ export function formatPrice(cedis: number): string {
+   return `GH₵${cedis.toLocaleString('en-US')}`;
+diff --git a/src/styles/shop.css b/src/styles/shop.css
+index 930d9cd..2e823a5 100644
+--- a/src/styles/shop.css
++++ b/src/styles/shop.css
+@@ -460,6 +460,71 @@
+   margin-top: 26px;
+ }
+ 
++.rose-guide {
++  max-width: 880px;
++  margin-top: 42px;
++}
++
++.rose-guide-title {
++  font-family: var(--font-display);
++  font-size: clamp(26px, 3vw, 38px);
++  line-height: 1.15;
++}
++
++.rose-guide-intro {
++  max-width: 68ch;
++  margin-top: 12px;
++  color: var(--cream-dim);
++}
++
++.rose-guide-list {
++  margin-top: 30px;
++  border-top: 1px solid rgba(244, 237, 225, 0.2);
++}
++
++.rose-guide-item {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr) auto auto;
++  align-items: center;
++  gap: clamp(14px, 3vw, 44px);
++  padding: 20px 0;
++  border-bottom: 1px solid rgba(244, 237, 225, 0.2);
++}
++
++.rose-guide-name {
++  text-transform: capitalize;
++}
++
++.rose-guide-price {
++  color: var(--gold-soft);
++  white-space: nowrap;
++}
++
++.rose-guide-link {
++  padding: 8px 0;
++  border-bottom: 1px solid var(--gold);
++  font-size: 12px;
++  letter-spacing: 0.12em;
++  text-transform: uppercase;
++}
++
++.rose-guide-link:hover,
++.rose-guide-link:focus-visible {
++  color: var(--gold-soft);
++}
++
++@media (max-width: 560px) {
++  .rose-guide-item {
++    grid-template-columns: minmax(0, 1fr) auto;
++    gap: 4px 12px;
++  }
++
++  .rose-guide-link {
++    grid-column: 1 / -1;
++    justify-self: start;
++  }
++}
++
+ /* Product detail (route: /product/<slug>) ----------------------------- */
+ 
+ .product-detail {
+-- 
+2.51.1
+
